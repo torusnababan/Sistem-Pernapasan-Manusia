@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kuis IPA SMP Sistem Pernapasan Manusia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    input[type="text"] {
+      width: 300px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    #timer {
+      font-weight: bold;
+      color: red;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Kuis IPA SMP</h2>
+  <h2>By: Torus Manuntun Nababan, M.Pd</h2>
+  <h2>Materi: Sistem Pernapasan Manusia</h2>
+  <!-- Form Identitas -->
+  <div id="identityForm">
+    <h3>Silakan isi identitas terlebih dahulu:</h3>
+    <label>Nama:
+      <input type="text" id="nama" required>
+    </label>
+    <label>Kelas:
+      <input type="text" id="kelas" required>
+    </label>
+    <label>Tahun Ajaran:
+      <input type="text" id="tahun" required>
+    </label>
+    <label>Nama Sekolah:
+      <input type="text" id="sekolah" required>
+    </label>
+    <button onclick="startQuiz()">Mulai Kuis</button>
+  </div>
+
+  <!-- Timer -->
+  <div id="timer" class="hidden"></div>
+
+  <!-- Form Soal -->
+  <form id="quizForm" class="hidden">
+    <div id="questionsContainer"></div>
+    <button type="button" onclick="submitQuiz()">Selesai dan Lihat Skor</button>
+  </form>
+
+  <div id="result" class="hidden"></div>
+
+  <script>
+    const questions = [
+      { question: "1. Fungsi utama sistem pernapasan pada manusia adalah...", options: ["Mencerna makanan", "Mengangkut zat sisa", "Mengambil oksigen dan mengeluarkan karbon dioksida", "Mengatur suhu tubuh"], answer: "Mengambil oksigen dan mengeluarkan karbon dioksida" },
+    { question: "2. Organ tempat pertukaran gas oksigen dan karbon dioksida terjadi adalah...", options: ["Trakea", "Bronkus", "Alveolus", "Hidung"], answer: "Alveolus" },
+    { question: "3. Saluran pernapasan yang menghubungkan rongga hidung dengan paru-paru adalah...", options: ["Esofagus", "Trakea", "Laring", "Diafragma"], answer: "Trakea" },
+    { question: "4. Proses masuknya udara ke dalam paru-paru disebut...", options: ["Ekskresi", "Inspirasi", "Ekspirasi", "Transpirasi"], answer: "Inspirasi" },
+    { question: "5. Gas yang dikeluarkan saat bernapas adalah...", options: ["Nitrogen", "Oksigen", "Karbon dioksida", "Helium"], answer: "Karbon dioksida" },
+    { question: "6. Otot utama yang membantu proses pernapasan adalah...", options: ["Lengan", "Perut", "Diafragma", "Paha"], answer: "Diafragma" },
+    { question: "7. Tempat masuknya udara ke sistem pernapasan manusia adalah...", options: ["Paru-paru", "Hidung", "Tenggorokan", "Laring"], answer: "Hidung" },
+    { question: "8. Alat pernapasan manusia yang memiliki silia untuk menyaring udara adalah...", options: ["Laring", "Paru-paru", "Trakea", "Hidung"], answer: "Hidung" },
+    { question: "9. Suara dihasilkan oleh organ yang disebut...", options: ["Faring", "Laring", "Trakea", "Bronkus"], answer: "Laring" },
+    { question: "10. Percabangan trakea yang menuju paru-paru disebut...", options: ["Bronkus", "Alveolus", "Laring", "Faring"], answer: "Bronkus" },
+    { question: "11. Pertukaran gas antara darah dan udara terjadi di...", options: ["Trakea", "Laring", "Bronkus", "Alveolus"], answer: "Alveolus" },
+    { question: "12. Alveolus dilapisi oleh...", options: ["Otot polos", "Sel darah putih", "Kapiler darah", "Kelenjar getah bening"], answer: "Kapiler darah" },
+    { question: "13. Proses keluarnya udara dari paru-paru disebut...", options: ["Inspirasi", "Inhalasi", "Ekspirasi", "Ventilasi"], answer: "Ekspirasi" },
+    { question: "14. Sistem pernapasan bekerja sama dengan sistem...", options: ["Ekskresi", "Pencernaan", "Peredaran darah", "Saraf"], answer: "Peredaran darah" },
+    { question: "15. Salah satu zat berbahaya dalam rokok yang dapat merusak paru-paru adalah...", options: ["Nitrogen", "Karbon monoksida", "Oksigen", "Karbon dioksida"], answer: "Karbon monoksida" },
+    { question: "16. Penyakit radang pada bronkus disebut...", options: ["Pneumonia", "Bronkitis", "Asma", "Emfisema"], answer: "Bronkitis" },
+    { question: "17. Penyakit yang menyebabkan penyempitan saluran pernapasan dan sesak napas adalah...", options: ["Asma", "Tuberkulosis", "Bronkitis", "Flu"], answer: "Asma" },
+    { question: "18. Penyakit yang disebabkan oleh infeksi bakteri Mycobacterium tuberculosis adalah...", options: ["Emfisema", "Pneumonia", "TBC", "Asma"], answer: "TBC" },
+    { question: "19. Alat bantu untuk mengukur kapasitas paru-paru disebut...", options: ["Stetoskop", "Sfigmomanometer", "Spirometer", "Termometer"], answer: "Spirometer" },
+    { question: "20. Zat yang menyebabkan warna hitam pada paru-paru perokok adalah...", options: ["Oksigen", "Tar", "Uap air", "Nitrogen"], answer: "Tar" }
+  ];
+
+    let quizTimer;
+    let countdownInterval;
+    const timeLimit = 20 * 60 * 1000; // 20 menit
+
+    function startQuiz() {
+      const nama = document.getElementById('nama').value;
+      const kelas = document.getElementById('kelas').value;
+      const tahun = document.getElementById('tahun').value;
+      const sekolah = document.getElementById('sekolah').value;
+
+      if (!nama || !kelas || !tahun || !sekolah) {
+        alert("Harap lengkapi semua data identitas.");
+        return;
+      }
+
+      document.getElementById('identityForm').classList.add('hidden');
+      document.getElementById('quizForm').classList.remove('hidden');
+      document.getElementById('timer').classList.remove('hidden');
+
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = "";
+      questions.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.classList.add('question');
+        div.innerHTML = `<p>${q.question}</p>` + q.options.map(opt => `
+          <label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`).join('');
+        container.appendChild(div);
+      });
+
+      // Timer otomatis submit setelah 20 menit
+      quizTimer = setTimeout(() => {
+        alert("Waktu habis! Kuis akan otomatis disubmit.");
+        submitQuiz();
+      }, timeLimit);
+
+      // Countdown display
+      let remaining = timeLimit / 1000;
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.textContent = `Sisa waktu: ${remaining} detik`;
+      countdownInterval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = `Sisa waktu: ${remaining} detik`;
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+    }
+
+    function submitQuiz() {
+      clearTimeout(quizTimer);
+      clearInterval(countdownInterval);
+
+      let score = 0;
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === q.answer) {
+          score += 10;
+        }
+      });
+
+      document.getElementById('quizForm').classList.add('hidden');
+      document.getElementById('timer').classList.add('hidden');
+      const resultDiv = document.getElementById('result');
+      resultDiv.classList.remove('hidden');
+
+      const nama = document.getElementById('nama').value;
+      const kelas = document.getElementById('kelas').value;
+      const tahun = document.getElementById('tahun').value;
+      const sekolah = document.getElementById('sekolah').value;
+
+      let message = "";
+      if (score >= 70) {
+        message = "<p style='color: green;'><strong>Selamat!</strong> Anda Sudah Bisa Melanjutkan ke Materi Berikutnya.</p>";
+      } else {
+        message = "<p style='color: red;'><strong>Mohon maaf.</strong> Silakan pelajari kembali materi ini sebelum melanjutkan ke materi berikutnya.</p>";
+      }
+
+      resultDiv.innerHTML = `
+        <h3>Hasil Kuis</h3>
+        <p><strong>Nama:</strong> ${nama}</p>
+        <p><strong>Kelas:</strong> ${kelas}</p>
+        <p><strong>Tahun Ajaran:</strong> ${tahun}</p>
+        <p><strong>Sekolah:</strong> ${sekolah}</p>
+        <p><strong>Skor Anda:</strong> ${score} dari 200</p>
+        ${message}
+      `;
+    }
+  </script>
+</body>
+</html>
